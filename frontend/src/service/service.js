@@ -17,3 +17,13 @@ export const loginService = async (credentials) => {
     throw new Error(err.message);
   }
 };
+
+export const updateUser = async (userUpdate) => {
+    try {
+         const token = localStorage.getItem("token");
+        const response = await api("/api/user/update", "PUT", userUpdate, token);
+        return response;
+    } catch (err) {
+        throw new Error(err.message);
+    }
+};

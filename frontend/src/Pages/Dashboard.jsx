@@ -1,9 +1,10 @@
 import React from "react";
 import "./styles/Dashboard.css";
 import logo from "../assets/ABC LOGO2.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem("user"));
   return (
     <div className="dashboard-container">
@@ -87,7 +88,7 @@ const Dashboard = () => {
                 <i className="fas fa-location-dot"></i>
                 <span>500m from Kaaba</span>
               </div>
-              <button className="book-button">Book Now</button>
+              <button className="book-button" onClick={()=>navigate("/PreCheckout")}>Book Now</button>
             </div>
           </div>
 

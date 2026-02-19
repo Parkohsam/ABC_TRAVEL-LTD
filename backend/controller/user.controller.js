@@ -144,4 +144,38 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login };
+
+// Update user info
+const updateUser = async (req, res) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+    const token = req.headers.authorization?.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      decoded.id,
+      { firstName, lastName, email },
+      { new: true }
+    );
+
+    return res.status(200).send({
+      status: true,
+      message: "Profile updated successfully",
+      data: {
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+    });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    return res.status(500).send({
+      status: false,
+      message: "Error updating profile",
+      error: err.message,
+    });
+  }
+};
+
+module.exports = { signUp, login, updateUser };

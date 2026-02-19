@@ -8,6 +8,7 @@ import SignUp from "./Pages/SignUp.jsx";
 import Dashboard from './Pages/Dashboard.jsx';
 import Profile from './Pages/Profile.jsx';
 import AdminDashboard from './Pages/AdminDashboard.jsx';
+import PreCheckout from './Pages/preCheckout.jsx';
 
 
 const router = createBrowserRouter([
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
   {path:"/Dashboard" , element: <Dashboard />},
   {path:"/Profile" , element: <Profile/>},
   { path: "/admin/AdminDashboard", element: <AdminDashboard /> },
+  {path: "/preCheckout" , element: <PreCheckout />}
   
 ]);
 
