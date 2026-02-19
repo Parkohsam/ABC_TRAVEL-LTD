@@ -1,0 +1,294 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+
+.signup-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 20px;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+}
+
+.signup-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(44, 90, 160, 0.15);
+  padding: 3rem;
+  max-width: 480px;
+  width: 100%;
+  animation: slideInUp 0.8s ease-out;
+}
+
+.signup-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.signup-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  letter-spacing: -0.5px;
+}
+
+.signup-subtitle {
+  font-size: 0.95rem;
+  color: #666;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  letter-spacing: 0.3px;
+}
+
+.google-signin {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #EA4335 0%, #C5221F 100%);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.google-signin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(234, 67, 53, 0.3);
+}
+
+.google-signin i {
+  font-size: 1.1rem;
+}
+
+.divider-text {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #999;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.divider-text::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e0e0e0;
+  transform: translateY(-50%);
+}
+
+.divider-text span {
+  background: white;
+  padding: 0 1rem;
+  position: relative;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  background: #f8f9fa;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2c5aa0;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+}
+
+.form-input::placeholder {
+  color: #bdc3c7;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+}
+
+.password-field {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  top: 2.5rem;
+  cursor: pointer;
+  color: #2c5aa0;
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password:hover {
+  color: #1e3f5a;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.checkbox-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #2c5aa0;
+}
+
+.checkbox-text a {
+  color: #2c5aa0;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.checkbox-text a:hover {
+  color: #1e3f5a;
+  /* text-decoration: underline; */
+}
+
+.signup-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #2c5aa0 0%, #1e3f5a 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+}
+
+.signup-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(44, 90, 160, 0.3);
+}
+
+.signup-button:active {
+  transform: translateY(0);
+}
+
+.login-link {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+}
+
+.login-link a {
+  color: #2c5aa0;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.login-link a:hover {
+  color: #1e3f5a;
+  /* text-decoration: underline; */
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .signup-wrapper {
+    padding: 2rem;
+  }
+
+  .signup-title {
+    font-size: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 15px;
+  }
+
+  .signup-wrapper {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .signup-title {
+    font-size: 1.25rem;
+  }
+
+  .signup-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .form-label {
+    font-size: 0.8rem;
+  }
+
+  .form-input {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.9rem;
+  }
+
+  .signup-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
