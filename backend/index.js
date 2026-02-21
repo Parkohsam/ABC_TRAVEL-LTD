@@ -23,6 +23,8 @@ mongoose
   });
 
 app.use("/api/user", userRoutes);
+const packageRoutes = require("./routes/package.routes");
+app.use("/api/packages", packageRoutes);
 
 app.listen(PORT, () => {
   console.log("port connected successfully ", PORT);

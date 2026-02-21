@@ -1,11 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./styles/Dashboard.css";
 import logo from "../assets/ABC LOGO2.png";
 import { Link, useNavigate } from "react-router-dom";
+import { getPackages } from "../service/service";
 
 const Dashboard = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
+  const [packages, setPackages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      const result = await getPackages();
+      setPackages(result.data);
+    } catch (err) {
+      console.error("Error fetching packages:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       {/* Header */}
@@ -29,32 +48,24 @@ const Dashboard = () => {
           </div>
           <p className="step-label">Profile</p>
         </div>
-
         <div className="step-divider"></div>
-
         <div className="step-item completed">
           <div className="step-circle">
             <i className="fas fa-check"></i>
           </div>
           <p className="step-label">Documents</p>
         </div>
-
         <div className="step-divider"></div>
-
         <div className="step-item active">
           <div className="step-circle">3</div>
           <p className="step-label">Package</p>
         </div>
-
         <div className="step-divider"></div>
-
         <div className="step-item">
           <div className="step-circle">4</div>
           <p className="step-label">Visa</p>
         </div>
-
         <div className="step-divider"></div>
-
         <div className="step-item">
           <div className="step-circle">5</div>
           <p className="step-label">Flight</p>
@@ -65,86 +76,50 @@ const Dashboard = () => {
       <div className="package-section">
         <h2 className="section-title">Choose Your Package</h2>
 
-        <div className="package-grid">
-          {/* Economy Card */}
-          <div className="package-card">
-            <div className="package-image">
-              <i className="fas fa-image"></i>
-            </div>
-            <div className="package-badge">$1,499</div>
-            <div className="package-content">
-              <h3 className="package-name">Economy</h3>
-              <div className="package-rating">
-                <span className="stars">
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star-half-alt"></i>
-                </span>
-                <span className="rating-value">4.5</span>
+        {loading ? (
+          <p>Loading packages...</p>
+        ) : packages.length === 0 ? (
+          <p>No packages available at the moment.</p>
+        ) : (
+          <div className="package-grid">
+            {packages.map((pkg, index) => (
+              <div key={pkg._id} className="package-card">
+                <div className={`package-image ${index === 1 ? "featured" : ""}`}>
+                  <i className="fas fa-image"></i>
+                  {index === 1 && (
+                    <span className="popular-badge">Most Popular</span>
+                  )}
+                </div>
+                <div className="package-badge">${pkg.price}</div>
+                <div className="package-content">
+                  <h3 className="package-name">{pkg.name}</h3>
+                  <p className="package-description">{pkg.description}</p>
+                  <div className="package-rating">
+                    <span className="stars">
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                      <i className="fas fa-star"></i>
+                    </span>
+                  </div>
+                  <div className="package-info">
+                    <span className={`availability-badge availability-${pkg.availability.toLowerCase()}`}>
+                      {pkg.availability} Availability
+                    </span>
+                    <span className="season-badge">{pkg.season}</span>
+                  </div>
+                  <button
+                    className={`book-button ${index === 1 ? "primary" : ""}`}
+                    onClick={() => navigate("/PreCheckout")}
+                  >
+                    Book Now
+                  </button>
+                </div>
               </div>
-              <div className="package-distance">
-                <i className="fas fa-location-dot"></i>
-                <span>500m from Kaaba</span>
-              </div>
-              <button className="book-button" onClick={()=>navigate("/PreCheckout")}>Book Now</button>
-            </div>
+            ))}
           </div>
-
-          {/* Standard Card */}
-          <div className="package-card">
-            <div className="package-image featured">
-              <i className="fas fa-image"></i>
-              <span className="popular-badge">Most Popular</span>
-            </div>
-            <div className="package-badge">$2,499</div>
-            <div className="package-content">
-              <h3 className="package-name">Standard</h3>
-              <div className="package-rating">
-                <span className="stars">
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                </span>
-                <span className="rating-value">5.0</span>
-              </div>
-              <div className="package-distance">
-                <i className="fas fa-location-dot"></i>
-                <span>300m from Kaaba</span>
-              </div>
-              <button className="book-button primary">Book Now</button>
-            </div>
-          </div>
-
-          {/* Premium Card */}
-          <div className="package-card">
-            <div className="package-image">
-              <i className="fas fa-image"></i>
-            </div>
-            <div className="package-badge">$3,999</div>
-            <div className="package-content">
-              <h3 className="package-name">Premium</h3>
-              <div className="package-rating">
-                <span className="stars">
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                  <i className="fas fa-star"></i>
-                </span>
-                <span className="rating-value">5.0</span>
-              </div>
-              <div className="package-distance">
-                <i className="fas fa-location-dot"></i>
-                <span>100m from Kaaba</span>
-              </div>
-              <button className="book-button">Book Now</button>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Prayer Times Widget */}

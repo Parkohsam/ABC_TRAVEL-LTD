@@ -1,8 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./styles/AdminDashboard.css";
+import { getPackages, createPackage, updatePackage, deletePackage } from "../service/service";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // Package states
+  const [packages, setPackages] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [packageForm, setPackageForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    availability: "High",
+    season: "",
+  });
 
   // Mock Data
   const stats = {
@@ -12,80 +28,122 @@ const AdminDashboard = () => {
     pendingApprovals: 12,
   };
 
-  const packages = [
-    {
-      id: 1,
-      name: "Economy",
-      price: "$1,499",
-      availability: "High",
-      season: "All Year",
-    },
-    {
-      id: 2,
-      name: "Standard",
-      price: "$2,499",
-      availability: "Medium",
-      season: "Peak Season",
-    },
-    {
-      id: 3,
-      name: "Premium",
-      price: "$3,999",
-      availability: "Low",
-      season: "Peak Season",
-    },
-  ];
-
   const bookings = [
-    {
-      id: 1,
-      customer: "Ahmed Hassan",
-      package: "Standard",
-      date: "2026-03-15",
-      total: "$2,499",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      customer: "Fatima Ali",
-      package: "Premium",
-      date: "2026-03-20",
-      total: "$3,999",
-      status: "Approved",
-    },
-    {
-      id: 3,
-      customer: "Omar Khan",
-      package: "Economy",
-      date: "2026-03-10",
-      total: "$1,499",
-      status: "Completed",
-    },
+    { id: 1, customer: "Ahmed Hassan", package: "Standard", date: "2026-03-15", total: "$2,499", status: "Pending" },
+    { id: 2, customer: "Fatima Ali", package: "Premium", date: "2026-03-20", total: "$3,999", status: "Approved" },
+    { id: 3, customer: "Omar Khan", package: "Economy", date: "2026-03-10", total: "$1,499", status: "Completed" },
   ];
 
   const customers = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      bookings: 3,
-      totalSpent: "$7,500",
-    },
-    {
-      id: 2,
-      name: "Muhammad Ali",
-      email: "ali@example.com",
-      bookings: 2,
-      totalSpent: "$5,000",
-    },
-    {
-      id: 3,
-      name: "Aisha Rahman",
-      email: "aisha@example.com",
-      bookings: 1,
-      totalSpent: "$2,499",
-    },
+    { id: 1, name: "Sarah Johnson", email: "sarah@example.com", bookings: 3, totalSpent: "$7,500" },
+    { id: 2, name: "Muhammad Ali", email: "ali@example.com", bookings: 2, totalSpent: "$5,000" },
+    { id: 3, name: "Aisha Rahman", email: "aisha@example.com", bookings: 1, totalSpent: "$2,499" },
   ];
+
+  // Fetch packages from backend
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      const result = await getPackages();
+      setPackages(result.data);
+    } catch (err) {
+      console.error("Error fetching packages:", err);
+    }
+  };
+
+  // Handle form input change
+  const handleFormChange = (e) => {
+    setPackageForm({ ...packageForm, [e.target.id]: e.target.value });
+  };
+
+  // Open edit modal with selected package data
+  const handleEditClick = (pkg) => {
+    setSelectedPackage(pkg);
+    setPackageForm({
+      name: pkg.name,
+      description: pkg.description,
+      price: pkg.price,
+      availability: pkg.availability,
+      season: pkg.season,
+    });
+    setShowEditModal(true);
+  };
+
+  // Open delete modal
+  const handleDeleteClick = (pkg) => {
+    setSelectedPackage(pkg);
+    setShowDeleteModal(true);
+  };
+
+  // Create package
+  const handleCreatePackage = async () => {
+    try {
+      await createPackage(packageForm);
+      setShowAddModal(false);
+      setPackageForm({ name: "", description: "", price: "", availability: "High", season: "" });
+      fetchPackages();
+    } catch (err) {
+      console.error("Error creating package:", err);
+      alert(err.message || "Error creating package");
+    }
+  };
+
+  // Update package
+  const handleUpdatePackage = async () => {
+    try {
+      await updatePackage(selectedPackage._id, packageForm);
+      setShowEditModal(false);
+      fetchPackages();
+    } catch (err) {
+      console.error("Error updating package:", err);
+      alert(err.message || "Error updating package");
+    }
+  };
+
+  // Delete package
+  const handleDeletePackage = async () => {
+    try {
+      await deletePackage(selectedPackage._id);
+      setShowDeleteModal(false);
+      fetchPackages();
+    } catch (err) {
+      console.error("Error deleting package:", err);
+      alert(err.message || "Error deleting package");
+    }
+  };
+
+  // Package Form JSX
+  const PackageForm = () => (
+    <div className="edit-form">
+      <div className="edit-field">
+        <label className="field-label">NAME</label>
+        <input type="text" id="name" className="edit-input" value={packageForm.name} onChange={handleFormChange} />
+      </div>
+      <div className="edit-field">
+        <label className="field-label">DESCRIPTION</label>
+        <textarea id="description" className="edit-input" rows="3" value={packageForm.description} onChange={handleFormChange} />
+      </div>
+      <div className="edit-field">
+        <label className="field-label">PRICE ($)</label>
+        <input type="number" id="price" className="edit-input" value={packageForm.price} onChange={handleFormChange} />
+      </div>
+      <div className="edit-field">
+        <label className="field-label">AVAILABILITY</label>
+        <select id="availability" className="edit-input" value={packageForm.availability} onChange={handleFormChange}>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div className="edit-field">
+        <label className="field-label">SEASON</label>
+        <input type="text" id="season" className="edit-input" value={packageForm.season} onChange={handleFormChange} />
+      </div>
+    </div>
+  );
 
   return (
     <div className="admin-dashboard">
@@ -101,64 +159,41 @@ const AdminDashboard = () => {
             <span className="notification-badge">3</span>
           </button>
           <div className="admin-profile">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="Admin"
-              className="profile-pic"
-            />
-            <span>Admin</span>
+            <img src="https://via.placeholder.com/40" alt="Admin" className="profile-pic" />
+            <span>{user?.firstName} {user?.lastName}</span>
           </div>
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <div className="admin-nav">
-        <button
-          className={`nav-tab ${activeTab === "overview" ? "active" : ""}`}
-          onClick={() => setActiveTab("overview")}
-        >
+        <button className={`nav-tab ${activeTab === "overview" ? "active" : ""}`} onClick={() => setActiveTab("overview")}>
           <i className="fas fa-chart-line"></i> Overview
         </button>
-        <button
-          className={`nav-tab ${activeTab === "packages" ? "active" : ""}`}
-          onClick={() => setActiveTab("packages")}
-        >
+        <button className={`nav-tab ${activeTab === "packages" ? "active" : ""}`} onClick={() => setActiveTab("packages")}>
           <i className="fas fa-box"></i> Packages
         </button>
-        <button
-          className={`nav-tab ${activeTab === "bookings" ? "active" : ""}`}
-          onClick={() => setActiveTab("bookings")}
-        >
+        <button className={`nav-tab ${activeTab === "bookings" ? "active" : ""}`} onClick={() => setActiveTab("bookings")}>
           <i className="fas fa-calendar-check"></i> Bookings
         </button>
-        <button
-          className={`nav-tab ${activeTab === "customers" ? "active" : ""}`}
-          onClick={() => setActiveTab("customers")}
-        >
+        <button className={`nav-tab ${activeTab === "customers" ? "active" : ""}`} onClick={() => setActiveTab("customers")}>
           <i className="fas fa-users"></i> Customers
         </button>
-        <button
-          className={`nav-tab ${activeTab === "reports" ? "active" : ""}`}
-          onClick={() => setActiveTab("reports")}
-        >
+        <button className={`nav-tab ${activeTab === "reports" ? "active" : ""}`} onClick={() => setActiveTab("reports")}>
           <i className="fas fa-chart-bar"></i> Reports
         </button>
       </div>
 
       {/* Content Area */}
       <div className="admin-content">
+
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="tab-content">
             <h2 className="section-title">Dashboard Overview</h2>
-
-            {/* Stats Cards */}
             <div className="stats-grid">
               <div className="stat-card">
-                <div
-                  className="stat-icon"
-                  style={{ backgroundColor: "#667eea" }}
-                >
+                <div className="stat-icon" style={{ backgroundColor: "#667eea" }}>
                   <i className="fas fa-shopping-cart"></i>
                 </div>
                 <div className="stat-info">
@@ -166,12 +201,8 @@ const AdminDashboard = () => {
                   <h3 className="stat-value">{stats.totalBookings}</h3>
                 </div>
               </div>
-
               <div className="stat-card">
-                <div
-                  className="stat-icon"
-                  style={{ backgroundColor: "#11998e" }}
-                >
+                <div className="stat-icon" style={{ backgroundColor: "#11998e" }}>
                   <i className="fas fa-dollar-sign"></i>
                 </div>
                 <div className="stat-info">
@@ -179,12 +210,8 @@ const AdminDashboard = () => {
                   <h3 className="stat-value">{stats.totalRevenue}</h3>
                 </div>
               </div>
-
               <div className="stat-card">
-                <div
-                  className="stat-icon"
-                  style={{ backgroundColor: "#f093fb" }}
-                >
+                <div className="stat-icon" style={{ backgroundColor: "#f093fb" }}>
                   <i className="fas fa-users"></i>
                 </div>
                 <div className="stat-info">
@@ -192,12 +219,8 @@ const AdminDashboard = () => {
                   <h3 className="stat-value">{stats.totalCustomers}</h3>
                 </div>
               </div>
-
               <div className="stat-card">
-                <div
-                  className="stat-icon"
-                  style={{ backgroundColor: "#ff6b6b" }}
-                >
+                <div className="stat-icon" style={{ backgroundColor: "#ff6b6b" }}>
                   <i className="fas fa-exclamation-circle"></i>
                 </div>
                 <div className="stat-info">
@@ -206,8 +229,6 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
-
-            {/* Recent Activity */}
             <div className="recent-section">
               <h3 className="section-subtitle">Recent Bookings</h3>
               <div className="activity-table">
@@ -225,11 +246,7 @@ const AdminDashboard = () => {
                     <div className="col-date">{booking.date}</div>
                     <div className="col-amount">{booking.total}</div>
                     <div className="col-status">
-                      <span
-                        className={`status-badge status-${booking.status.toLowerCase()}`}
-                      >
-                        {booking.status}
-                      </span>
+                      <span className={`status-badge status-${booking.status.toLowerCase()}`}>{booking.status}</span>
                     </div>
                   </div>
                 ))}
@@ -243,48 +260,54 @@ const AdminDashboard = () => {
           <div className="tab-content">
             <div className="section-header">
               <h2 className="section-title">Package Management</h2>
-              <button className="btn-primary">
+              <button className="btn-primary" onClick={() => setShowAddModal(true)}>
                 <i className="fas fa-plus"></i> Add Package
               </button>
             </div>
 
             <div className="packages-grid">
-              {packages.map((pkg) => (
-                <div key={pkg.id} className="package-card">
-                  <div className="package-header">
-                    <h3>{pkg.name}</h3>
-                    <div className="package-actions">
-                      <button className="action-btn edit">
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <button className="action-btn delete">
-                        <i className="fas fa-trash"></i>
-                      </button>
+              {packages.length === 0 ? (
+                <p>No packages found. Add one to get started.</p>
+              ) : (
+                packages.map((pkg) => (
+                  <div key={pkg._id} className="package-card">
+                    <div className="package-header">
+                      <h3>{pkg.name}</h3>
+                      <div className="package-actions">
+                        <button className="action-btn edit" onClick={() => handleEditClick(pkg)}>
+                          <i className="fas fa-edit"></i>
+                        </button>
+                        <button className="action-btn delete" onClick={() => handleDeleteClick(pkg)}>
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="package-details">
+                      <div className="detail-row">
+                        <span className="label">Price:</span>
+                        <span className="value">${pkg.price}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Availability:</span>
+                        <span className={`availability availability-${pkg.availability.toLowerCase()}`}>
+                          {pkg.availability}
+                        </span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Season:</span>
+                        <span className="value">{pkg.season}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Description:</span>
+                        <span className="value">{pkg.description}</span>
+                      </div>
+                    </div>
+                    <div className="package-footer">
+                      <button className="btn-secondary">Manage Season</button>
                     </div>
                   </div>
-                  <div className="package-details">
-                    <div className="detail-row">
-                      <span className="label">Price:</span>
-                      <span className="value">{pkg.price}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="label">Availability:</span>
-                      <span
-                        className={`availability availability-${pkg.availability.toLowerCase()}`}
-                      >
-                        {pkg.availability}
-                      </span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="label">Season:</span>
-                      <span className="value">{pkg.season}</span>
-                    </div>
-                  </div>
-                  <div className="package-footer">
-                    <button className="btn-secondary">Manage Season</button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         )}
@@ -303,31 +326,20 @@ const AdminDashboard = () => {
                 </select>
               </div>
             </div>
-
             <div className="bookings-container">
               {bookings.map((booking) => (
                 <div key={booking.id} className="booking-card">
                   <div className="booking-main">
                     <div className="booking-info">
                       <h3>{booking.customer}</h3>
-                      <p className="booking-meta">
-                        {booking.package} • {booking.date}
-                      </p>
+                      <p className="booking-meta">{booking.package} • {booking.date}</p>
                     </div>
                     <div className="booking-amount">{booking.total}</div>
                   </div>
                   <div className="booking-actions">
-                    <span
-                      className={`status-badge status-${booking.status.toLowerCase()}`}
-                    >
-                      {booking.status}
-                    </span>
-                    <button className="btn-action approve">
-                      <i className="fas fa-check"></i> Approve
-                    </button>
-                    <button className="btn-action view">
-                      <i className="fas fa-eye"></i> View
-                    </button>
+                    <span className={`status-badge status-${booking.status.toLowerCase()}`}>{booking.status}</span>
+                    <button className="btn-action approve"><i className="fas fa-check"></i> Approve</button>
+                    <button className="btn-action view"><i className="fas fa-eye"></i> View</button>
                   </div>
                 </div>
               ))}
@@ -340,13 +352,8 @@ const AdminDashboard = () => {
           <div className="tab-content">
             <div className="section-header">
               <h2 className="section-title">Customer Management</h2>
-              <input
-                type="text"
-                placeholder="Search customers..."
-                className="search-input"
-              />
+              <input type="text" placeholder="Search customers..." className="search-input" />
             </div>
-
             <div className="customers-table">
               <div className="table-header">
                 <div className="col-name">Name</div>
@@ -362,12 +369,8 @@ const AdminDashboard = () => {
                   <div className="col-bookings">{customer.bookings}</div>
                   <div className="col-spent">{customer.totalSpent}</div>
                   <div className="col-actions">
-                    <button className="btn-action small">
-                      <i className="fas fa-file-alt"></i> Documents
-                    </button>
-                    <button className="btn-action small">
-                      <i className="fas fa-history"></i> History
-                    </button>
+                    <button className="btn-action small"><i className="fas fa-file-alt"></i> Documents</button>
+                    <button className="btn-action small"><i className="fas fa-history"></i> History</button>
                   </div>
                 </div>
               ))}
@@ -379,7 +382,6 @@ const AdminDashboard = () => {
         {activeTab === "reports" && (
           <div className="tab-content">
             <h2 className="section-title">Reports & Analytics</h2>
-
             <div className="reports-grid">
               <div className="report-card">
                 <div className="report-header">
@@ -387,78 +389,101 @@ const AdminDashboard = () => {
                   <i className="fas fa-chart-line"></i>
                 </div>
                 <div className="report-body">
-                  <div className="report-stat">
-                    <span className="label">Total Bookings</span>
-                    <span className="value large">240</span>
-                  </div>
-                  <div className="report-stat">
-                    <span className="label">Month Growth</span>
-                    <span className="value positive">+15%</span>
-                  </div>
-                  <div className="report-stat">
-                    <span className="label">Conversion Rate</span>
-                    <span className="value">42%</span>
-                  </div>
+                  <div className="report-stat"><span className="label">Total Bookings</span><span className="value large">240</span></div>
+                  <div className="report-stat"><span className="label">Month Growth</span><span className="value positive">+15%</span></div>
+                  <div className="report-stat"><span className="label">Conversion Rate</span><span className="value">42%</span></div>
                 </div>
               </div>
-
               <div className="report-card">
                 <div className="report-header">
                   <h3>Revenue Reports</h3>
                   <i className="fas fa-chart-bar"></i>
                 </div>
                 <div className="report-body">
-                  <div className="report-stat">
-                    <span className="label">Total Revenue</span>
-                    <span className="value large">$48,500</span>
-                  </div>
-                  <div className="report-stat">
-                    <span className="label">Month Revenue</span>
-                    <span className="value positive">+22%</span>
-                  </div>
-                  <div className="report-stat">
-                    <span className="label">Avg Order Value</span>
-                    <span className="value">$2,435</span>
-                  </div>
+                  <div className="report-stat"><span className="label">Total Revenue</span><span className="value large">$48,500</span></div>
+                  <div className="report-stat"><span className="label">Month Revenue</span><span className="value positive">+22%</span></div>
+                  <div className="report-stat"><span className="label">Avg Order Value</span><span className="value">$2,435</span></div>
                 </div>
               </div>
-
               <div className="report-card">
                 <div className="report-header">
                   <h3>Customer Highlights</h3>
                   <i className="fas fa-star"></i>
                 </div>
                 <div className="report-body">
-                  <div className="report-stat">
-                    <span className="label">Total Customers</span>
-                    <span className="value large">156</span>
-                  </div>
-                  <div className="report-stat">
-                    <span className="label">New Customers</span>
-                    <span className="value positive">+32</span>
-                  </div>
-                  <div className="report-stat">
-                    <span className="label">Retention Rate</span>
-                    <span className="value">78%</span>
-                  </div>
+                  <div className="report-stat"><span className="label">Total Customers</span><span className="value large">156</span></div>
+                  <div className="report-stat"><span className="label">New Customers</span><span className="value positive">+32</span></div>
+                  <div className="report-stat"><span className="label">Retention Rate</span><span className="value">78%</span></div>
                 </div>
               </div>
             </div>
-
             <div className="download-section">
               <h3>Export Reports</h3>
               <div className="download-buttons">
-                <button className="btn-secondary">
-                  <i className="fas fa-download"></i> Download PDF
-                </button>
-                <button className="btn-secondary">
-                  <i className="fas fa-download"></i> Download CSV
-                </button>
+                <button className="btn-secondary"><i className="fas fa-download"></i> Download PDF</button>
+                <button className="btn-secondary"><i className="fas fa-download"></i> Download CSV</button>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Add Package Modal */}
+      {showAddModal && (
+        <div className="modal-overlay">
+          <div className="modal-box edit-modal">
+            <div className="modal-header">
+              <h3 className="modal-title">Add New Package</h3>
+              <button className="modal-close" onClick={() => setShowAddModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <PackageForm />
+            <div className="modal-actions">
+              <button className="modal-btn cancel" onClick={() => setShowAddModal(false)}>Cancel</button>
+              <button className="modal-btn confirm" onClick={handleCreatePackage}>Add Package</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Package Modal */}
+      {showEditModal && (
+        <div className="modal-overlay">
+          <div className="modal-box edit-modal">
+            <div className="modal-header">
+              <h3 className="modal-title">Edit Package</h3>
+              <button className="modal-close" onClick={() => setShowEditModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <PackageForm />
+            <div className="modal-actions">
+              <button className="modal-btn cancel" onClick={() => setShowEditModal(false)}>Cancel</button>
+              <button className="modal-btn confirm" onClick={handleUpdatePackage}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className="modal-icon signout-icon">
+              <i className="fas fa-trash"></i>
+            </div>
+            <h3 className="modal-title">Delete Package</h3>
+            <p className="modal-message">
+              Are you sure you want to delete <strong>{selectedPackage?.name}</strong>? This cannot be undone.
+            </p>
+            <div className="modal-actions">
+              <button className="modal-btn cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="modal-btn confirm" onClick={handleDeletePackage}>Yes, Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
