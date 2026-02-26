@@ -1,8 +1,8 @@
-const userModel = require("../model/user.model");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import userModel from "../model/user.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-//  Sign Up 
+//  Sign Up
 
 const signUp = async (req, res) => {
   try {
@@ -11,7 +11,8 @@ const signUp = async (req, res) => {
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).send({
         status: false,
-        message: "Please fill in all required fields: firstName, lastName, email, password",
+        message:
+          "Please fill in all required fields: firstName, lastName, email, password",
       });
     }
 
@@ -56,7 +57,7 @@ const signUp = async (req, res) => {
     const token = jwt.sign(
       { id: newUser._id, email: newUser.email, role: newUser.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
     return res.status(201).send({
@@ -109,7 +110,10 @@ const login = async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      existingUser.password,
+    );
     if (!isPasswordValid) {
       return res.status(401).send({
         status: false,
@@ -118,9 +122,13 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: existingUser._id, email: existingUser.email, role: existingUser.role },
+      {
+        id: existingUser._id,
+        email: existingUser.email,
+        role: existingUser.role,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
     return res.status(200).send({
@@ -144,7 +152,6 @@ const login = async (req, res) => {
   }
 };
 
-
 // Update user info
 const updateUser = async (req, res) => {
   try {
@@ -155,7 +162,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await userModel.findByIdAndUpdate(
       decoded.id,
       { firstName, lastName, email },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).send({
@@ -178,4 +185,23 @@ const updateUser = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login, updateUser };
+// user display
+const getUsers = async (req, res) => {
+  try {
+    const users = await userModel.find({ role: "user" }).select("-password");
+    return res.status(200).send({
+      status: true,
+      message: "Users fetched successfully",
+      data: users,
+    });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return res.status(500).send({
+      status: false,
+      message: "Error fetching users",
+      error: err.message,
+    });
+  }
+};
+
+export { signUp, login, updateUser, getUsers };

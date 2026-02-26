@@ -84,7 +84,9 @@ const Dashboard = () => {
           <div className="package-grid">
             {packages.map((pkg, index) => (
               <div key={pkg._id} className="package-card">
-                <div className={`package-image ${index === 1 ? "featured" : ""}`}>
+                <div
+                  className={`package-image ${index === 1 ? "featured" : ""}`}
+                >
                   <i className="fas fa-image"></i>
                   {index === 1 && (
                     <span className="popular-badge">Most Popular</span>
@@ -104,14 +106,18 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <div className="package-info">
-                    <span className={`availability-badge availability-${pkg.availability.toLowerCase()}`}>
+                    <span
+                      className={`availability-badge availability-${pkg.availability.toLowerCase()}`}
+                    >
                       {pkg.availability} Availability
                     </span>
                     <span className="season-badge">{pkg.season}</span>
                   </div>
                   <button
                     className={`book-button ${index === 1 ? "primary" : ""}`}
-                    onClick={() => navigate("/PreCheckout")}
+                    onClick={() =>
+                      navigate("/booking", { state: { package: pkg } })
+                    }
                   >
                     Book Now
                   </button>

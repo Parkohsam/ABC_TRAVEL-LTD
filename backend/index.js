@@ -1,10 +1,14 @@
-const express = require("express");
-const app = express();
-require("dotenv").config();
-const mongoose = require("mongoose");
-const cors = require("cors");
-const userRoutes = require("./routes/user.routes");
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import cors from "cors";
+import userRoutes from "./routes/user.routes.js";
+import packageRoutes from "./routes/package.routes.js";
+import bookingRoutes from "./routes/booking.routes.js";
 
+dotenv.config();
+
+const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -23,8 +27,8 @@ mongoose
   });
 
 app.use("/api/user", userRoutes);
-const packageRoutes = require("./routes/package.routes");
 app.use("/api/packages", packageRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 app.listen(PORT, () => {
   console.log("port connected successfully ", PORT);
